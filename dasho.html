@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Control · CITIC Dicastal</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --bg-grid: rgba(0, 30, 80, 0.04);
+            --panel: #ffffff;
+            --panel-raised: #f8fafc;
+            --steel: #cbd5e1;
+            --steel-light: #94a3b8;
+            --hairline: #e2e8f0;
+            --metal-text: #475569;
+            --text: #0f172a;
+            --text-dim: #64748b;
+            --amber: #d97706;
+            --amber-dim: #fef3c7;
+            --green: #16a34a;
+            --green-dim: #dcfce7;
+            --red: #dc2626;
+            --red-dim: #fee2e2;
+            --blue: #0284c7;
+            --display: 'Rajdhani', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scrollbar-color: var(--steel) var(--bg);
+        }
+
+        body {
+            background:
+                repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0px, rgba(0, 0, 0, 0.01) 1px, transparent 1px, transparent 8px),
+                linear-gradient(var(--bg-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px),
+                var(--bg);
+            background-size: auto, 40px 40px, 40px 40px, auto;
+            color: var(--text);
+            font-family: var(--body);
+            min-height: 100vh;
+            padding: 18px 22px 60px;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        ::selection {
+            background: var(--amber-dim);
+            color: var(--amber);
+        }
+
+        /* ---------- HEADER ---------- */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: var(--panel);
+            border: 1px solid var(--steel);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--amber);
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand-text h1 {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+            color: var(--text);
+        }
+
+        .brand-text .sub {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        .status-cluster {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--green);
+            background: var(--panel);
+            border: 1px solid var(--hairline);
+            padding: 7px 12px;
+            border-radius: 999px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 0 3px var(--green-dim);
+            animation: pulse 1.7s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        .clock {
+            font-family: var(--mono);
+            font-size: 0.95rem;
+            color: var(--metal-text);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .live-dot {
+                animation: none;
+            }
+        }
+
+        /* ---------- KPI STRIP ---------- */
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .kpi::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--kpi-accent, var(--steel-light));
+        }
+
+        .kpi-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .kpi-val {
+            font-family: var(--display);
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text);
+        }
+
+        .kpi-sub {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        /* ---------- FILTER BAR ---------- */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--panel);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        input[type="date"],
+        select.ctl,
+        input.search {
+            background: var(--panel-raised);
+            border: 1px solid var(--steel);
+            color: var(--text);
+            border-radius: 7px;
+            padding: 7px 10px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        input[type="date"]:focus,
+        select.ctl:focus,
+        input.search:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 2px var(--amber-dim);
+        }
+
+        input.search {
+            font-family: var(--mono);
+            width: 150px;
+        }
+
+        .shift-chips {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chip {
+            background: var(--panel-raised);
+            border: 1px solid var(--steel);
+            color: var(--metal-text);
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 6px 13px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+
+        .chip:hover {
+            border-color: var(--amber);
+            color: var(--amber);
+        }
+
+        .chip.active {
+            background: var(--amber);
+            border-color: var(--amber);
+            color: #ffffff;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-track {
+            width: 34px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--steel);
+            position: relative;
+            transition: 0.2s ease;
+        }
+
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.on .toggle-track {
+            background: var(--red);
+        }
+
+        .toggle-switch.on .toggle-track::after {
+            transform: translateX(16px);
+        }
+
+        .toggle-text {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .btn-ghost {
+            margin-left: auto;
+            background: var(--panel-raised);
+            border: 1px solid var(--steel);
+            color: var(--metal-text);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: 0.15s ease;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--amber);
+            color: var(--amber);
+            background: var(--panel);
+        }
+
+        /* ---------- MACHINE GRID ---------- */
+        .section-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-heading h2 {
+            font-family: var(--display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--metal-text);
+        }
+
+        .section-heading .count {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        /* Set to 2 columns in a row */
+        .machine-grid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .machine-card {
+        
+            background: var(--panel);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius);
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .machine-card::before,
+        .machine-card::after {
+            content: '';
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-color: var(--steel-light);
+            transition: border-color 0.15s ease;
+        }
+
+        .machine-card::before {
+            top: 8px;
+            left: 8px;
+            border-top: 1.5px solid var(--steel-light);
+            border-left: 1.5px solid var(--steel-light);
+        }
+
+        .machine-card::after {
+            bottom: 8px;
+            right: 8px;
+            border-bottom: 1.5px solid var(--steel-light);
+            border-right: 1.5px solid var(--steel-light);
+        }
+
+        .machine-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--steel-light);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .machine-card:hover::before,
+        .machine-card:hover::after {
+            border-color: var(--amber);
+        }
+
+        .machine-card.status-red {
+            border-left: 4px solid var(--red);
+        }
+
+        .machine-card.status-amber {
+            border-left: 4px solid var(--amber);
+        }
+
+        .machine-card.status-green {
+            border-left: 4px solid var(--green);
+        }
+
+        .mc-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .mc-id {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 0.90rem;
+            color: var(--text);
+        }
+
+        .mc-shift-badge {
+            font-family: var(--mono);
+            font-size: 0.45rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 5px;
+            background: var(--panel-raised);
+            border: 1px solid var(--steel);
+            color: var(--metal-text);
+        }
+
+        .mc-part {
+            font-size: 0.78rem;
+            color: var(--metal-text);
+            font-weight: 500;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mc-op {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .gauge-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 4px 0 6px;
+        }
+
+        .gauge-val {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: -30px;
+        }
+
+        .gauge-caption {
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .spark-row {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 26px;
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px dashed var(--hairline);
+        }
+
+        .spark-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            min-height: 3px;
+            background: var(--steel);
+        }
+
+        .mc-alert-flag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--red);
+            font-size: 0.75rem;
+        }
+
+        /* ---------- EMPTY STATE ---------- */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            border: 1px dashed var(--steel);
+            border-radius: var(--radius);
+            color: var(--text-dim);
+            background: var(--panel);
+        }
+
+        .empty-state i {
+            font-size: 1.8rem;
+            color: var(--steel-light);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-state strong {
+            color: var(--metal-text);
+            display: block;
+            margin-bottom: 4px;
+            font-family: var(--display);
+            font-size: 1.1rem;
+        }
+
+        /* ---------- MODAL ---------- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--steel);
+            border-radius: 14px;
+            width: 640px;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--hairline);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        .modal-head h2 {
+            font-family: var(--display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .modal-head .meta {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--red);
+        }
+
+        table.hour-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        table.hour-table th {
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        table.hour-table td {
+            padding: 8px;
+            border-bottom: 1px solid var(--hairline);
+            font-family: var(--mono);
+            color: var(--text);
+        }
+
+        .pill-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .pill-status.ok {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .pill-status.low {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        /* ---------- TOAST ---------- */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 22px;
+            background: var(--panel);
+            border: 1px solid var(--amber);
+            color: var(--amber);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: none;
+            z-index: 10000;
+            max-width: calc(100vw - 44px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ---------- FOCUS & RESPONSIVE ---------- */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        .machine-card:focus-visible {
+            outline: 2px solid var(--amber);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 1000px) {
+            .kpi-strip {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .machine-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .kpi-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn-ghost {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-mark"><i class="fa-solid fa-gauge-high"></i></div>
+            <div class="brand-text">
+                <h1>Production Control</h1>
+                <div class="sub">SW CNC Line · MSA01–MSA21</div>
+            </div>
+        </div>
+        <div class="status-cluster">
+            <div class="clock" id="clock">--:--:--</div>
+            <div class="live-indicator"><span class="live-dot"></span> <span id="liveText">Live · connecting</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-strip" id="kpiStrip">
+        <!-- filled by JS -->
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-group">
+            <span class="filter-label">Date</span>
+            <input type="date" id="dateFilter">
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Shift</span>
+            <div class="shift-chips" id="shiftChips">
+                <button class="chip active" data-shift="ALL">ALL</button>
+                <button class="chip" data-shift="A">A</button>
+                <button class="chip" data-shift="B">B</button>
+                <button class="chip" data-shift="C">C</button>
+                <button class="chip" data-shift="D">D</button>
+            </div>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Search</span>
+            <input type="text" class="search" id="searchInput" placeholder="e.g. MSA07">
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Sort</span>
+            <select class="ctl" id="sortSelect">
+                <option value="id">Machine ID</option>
+                <option value="eff_asc">Efficiency ↑</option>
+                <option value="eff_desc">Efficiency ↓</option>
+                <option value="downtime">Most Downtime</option>
+            </select>
+        </div>
+        <div class="toggle-switch" id="alertToggle">
+            <div class="toggle-track"></div>
+            <span class="toggle-text">Alerts only</span>
+        </div>
+        <button class="btn-ghost" id="exportBtn"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+    </div>
+
+    <div class="section-heading">
+        <h2>Machine Floor</h2>
+        <span class="count" id="machineCount">0 reporting</span>
+    </div>
+
+    <div class="machine-grid" id="machineGrid"></div>
+
+    <!-- MACHINE DETAIL MODAL -->
+    <div class="overlay" id="detailOverlay">
+        <div class="modal">
+            <div class="modal-head">
+                <div>
+                    <h2 id="modalMachineId">MSA00</h2>
+                    <div class="meta" id="modalMeta">—</div>
+                </div>
+                <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <table class="hour-table">
+                <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th>Target</th>
+                        <th>Actual</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="modalHourBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUKx8KLmsgXyekDSPyga-DCupOr2e_bSg",
+            authDomain: "hourly-users-57fe1.firebaseapp.com",
+            databaseURL: "https://hourly-users-57fe1-default-rtdb.firebaseio.com",
+            projectId: "hourly-users-57fe1",
+            storageBucket: "hourly-users-57fe1.firebasestorage.app",
+            messagingSenderId: "538548762721",
+            appId: "1:538548762721:web:303256450853d0d7bbd220"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let allLogs = {};      // logKey -> payload
+        let totalMachineCount = 21;
+
+        const state = {
+            date: todayStr(),
+            shift: 'ALL',
+            search: '',
+            alertsOnly: false,
+            sort: 'id'
+        };
+
+        function todayStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3200);
+        }
+
+        // ---------- CLOCK ----------
+        function tickClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+        }
+        setInterval(tickClock, 1000);
+        tickClock();
+
+        // ---------- DATA LOADING ----------
+        async function loadMachineCount() {
+            try {
+                const snap = await get(ref(db, 'machines'));
+                if (snap.exists()) totalMachineCount = Object.keys(snap.val()).length;
+            } catch (e) { /* fall back to default of 21 */ }
+        }
+
+        function attachLiveListener() {
+            const logsRef = ref(db, 'daily_logs');
+            onValue(logsRef, (snapshot) => {
+                allLogs = snapshot.exists() ? snapshot.val() : {};
+                document.getElementById('liveText').innerText = 'Live · synced ' + new Date().toLocaleTimeString('en-GB');
+                renderAll();
+            }, (err) => {
+                console.error(err);
+                document.getElementById('liveText').innerText = 'Connection error';
+                showToast('⚠️ Could not reach Realtime Database');
+            });
+        }
+
+        // ---------- FILTERING ----------
+        function getFilteredLogs() {
+            const q = state.search.trim().toUpperCase();
+            return Object.entries(allLogs)
+                .map(([key, log]) => ({ key, ...log }))
+                .filter(l => l.date === state.date)
+                .filter(l => state.shift === 'ALL' || l.shift === state.shift)
+                .filter(l => !q || (l.machineId || '').toUpperCase().includes(q))
+                .map(l => {
+                    const target = (l.hourlyTarget || 0) * 8;
+                    const actual = Array.isArray(l.hours) ? l.hours.reduce((a, b) => a + (Number(b) || 0), 0) : (l.totalActual || 0);
+                    const efficiency = target > 0 ? (actual / target) * 100 : 0;
+                    const downtimeCount = l.reasons ? Object.keys(l.reasons).length : 0;
+                    return { ...l, target, actual, efficiency, downtimeCount };
+                })
+                .filter(l => !state.alertsOnly || l.efficiency < 85)
+                .sort((a, b) => {
+                    if (state.sort === 'eff_asc') return a.efficiency - b.efficiency;
+                    if (state.sort === 'eff_desc') return b.efficiency - a.efficiency;
+                    if (state.sort === 'downtime') return b.downtimeCount - a.downtimeCount;
+                    return (a.machineId || '').localeCompare(b.machineId || '');
+                });
+        }
+
+        // ---------- GAUGE (SVG) ----------
+        function polar(cx, cy, r, thetaDeg) {
+            const rad = thetaDeg * Math.PI / 180;
+            return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+        }
+        function arcPath(cx, cy, r, thetaStart, thetaEnd) {
+            const p1 = polar(cx, cy, r, thetaStart);
+            const p2 = polar(cx, cy, r, thetaEnd);
+            return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${r} ${r} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+        }
+
+        function buildGaugeSVG(effPct) {
+            const cx = 60, cy = 62, r = 48;
+            const maxScale = 120;
+            const clamped = Math.max(0, Math.min(maxScale, effPct));
+            const pRed = 85 / maxScale, pAmber = 98 / maxScale;
+            const thetaOf = (p) => 180 - 180 * p;
+
+            const redPath = arcPath(cx, cy, r, thetaOf(0), thetaOf(pRed));
+            const amberPath = arcPath(cx, cy, r, thetaOf(pRed), thetaOf(pAmber));
+            const greenPath = arcPath(cx, cy, r, thetaOf(pAmber), thetaOf(1));
+
+            const needleTheta = thetaOf(clamped / maxScale);
+            const needleTip = polar(cx, cy, r - 8, needleTheta);
+
+            let needleColor = 'var(--red)';
+            if (effPct >= 98) needleColor = 'var(--green)';
+            else if (effPct >= 85) needleColor = 'var(--amber)';
+
+            return `
+        <svg width="120" height="70" viewBox="0 0 120 70">
+          <path d="${redPath}"   stroke="#fee2e2" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="${amberPath}" stroke="#fef3c7" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="${greenPath}" stroke="#dcfce7" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="${arcPath(cx, cy, r, thetaOf(0), thetaOf(Math.min(clamped / maxScale, 1)))}"
+                stroke="${needleColor}" stroke-width="9" fill="none" stroke-linecap="round"/>
+        </svg>
+      `;
+        }
+
+        // ---------- RENDER: KPIs ----------
+        function renderKPIs(logs) {
+            const totalActual = logs.reduce((a, l) => a + l.actual, 0);
+            const totalTarget = logs.reduce((a, l) => a + l.target, 0);
+            const overallEff = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+            const alertCount = logs.filter(l => l.efficiency < 85).length;
+            const downtimeEvents = logs.reduce((a, l) => a + l.downtimeCount, 0);
+            const reporting = logs.length;
+
+            let effAccent = 'var(--red)';
+            if (overallEff >= 98) effAccent = 'var(--green)';
+            else if (overallEff >= 85) effAccent = 'var(--amber)';
+
+            const kpis = [
+                { label: 'Actual Output', val: totalActual.toLocaleString(), sub: `of ${totalTarget.toLocaleString()} planned`, accent: 'var(--blue)' },
+                { label: 'Overall OEE', val: overallEff + '%', sub: 'target-weighted', accent: effAccent },
+                { label: 'Machines Reporting', val: reporting, sub: `of ${totalMachineCount} on the line`, accent: 'var(--metal-text)' },
+                { label: 'In Alert (<85%)', val: alertCount, sub: alertCount ? 'needs attention' : 'all clear', accent: alertCount ? 'var(--red)' : 'var(--green)' },
+                { label: 'Downtime Events', val: downtimeEvents, sub: 'tagged this view', accent: 'var(--amber)' },
+                { label: 'Shift', val: state.shift === 'ALL' ? 'ALL' : state.shift, sub: state.date, accent: 'var(--steel-light)' }
+            ];
+
+            document.getElementById('kpiStrip').innerHTML = kpis.map(k => `
+        <div class="kpi" style="--kpi-accent:${k.accent}">
+          <div class="kpi-label">${k.label}</div>
+          <div class="kpi-val">${k.val}</div>
+          <div class="kpi-sub">${k.sub}</div>
+        </div>
+      `).join('');
+        }
+
+        // ---------- RENDER: GRID ----------
+        function renderGrid(logs) {
+            const grid = document.getElementById('machineGrid');
+            document.getElementById('machineCount').innerText = `${logs.length} reporting`;
+
+            if (!logs.length) {
+                grid.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <strong>No production logged</strong>
+            for ${state.date}${state.shift !== 'ALL' ? ' · Shift ' + state.shift : ''} — check the date or shift filter.
+          </div>`;
+                return;
+            }
+
+            grid.innerHTML = logs.map(l => {
+                const statusClass = l.efficiency < 85 ? 'status-red' : (l.efficiency < 98 ? 'status-amber' : 'status-green');
+                const barColor = l.efficiency < 85 ? 'var(--red)' : (l.efficiency < 98 ? 'var(--amber)' : 'var(--green)');
+                const hours = Array.isArray(l.hours) ? l.hours : [0, 0, 0, 0, 0, 0, 0, 0];
+                const maxHour = Math.max(1, ...hours.map(h => Number(h) || 0), l.hourlyTarget || 1);
+                const sparkBars = hours.map(h => {
+                    const pct = Math.max(4, Math.round((Number(h) || 0) / maxHour * 100));
+                    const below = Number(h) < (l.hourlyTarget || 0);
+                    return `<div class="spark-bar" style="height:${pct}%; background:${below ? 'var(--red)' : 'var(--green)'}"></div>`;
+                }).join('');
+
+                return `
+          <div class="machine-card ${statusClass}" tabindex="0" onclick="window.openDetail('${l.key}')">
+            ${l.efficiency < 85 ? '<i class="fa-solid fa-triangle-exclamation mc-alert-flag"></i>' : ''}
+            <div class="mc-top">
+              <div class="mc-id">${l.machineId || '—'}</div>
+              <div class="mc-shift-badge">SHIFT ${l.shift || '-'}</div>
+            </div>
+            <div class="mc-part">${l.partName || 'No part set'}</div>
+            <div class="mc-op">OP ${l.operatorId || '---'}</div>
+            <div class="gauge-wrap">
+              ${buildGaugeSVG(l.efficiency)}
+              <div></div>
+              <div class="gauge-val" style="color:${barColor}">${Math.round(l.efficiency)}%</div>
+              <div class="gauge-caption">${l.actual} / ${l.target} units</div>
+            </div>
+            <div class="spark-row">${sparkBars}</div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        // ---------- MODAL ----------
+        window.openDetail = function (logKey) {
+            const l = allLogs[logKey];
+            if (!l) return;
+            document.getElementById('modalMachineId').innerText = l.machineId || '—';
+            document.getElementById('modalMeta').innerText =
+                `${l.partName || 'No part'} · Shift ${l.shift} · OP ${l.operatorId} · ${l.date}`;
+
+            const hours = Array.isArray(l.hours) ? l.hours : [0, 0, 0, 0, 0, 0, 0, 0];
+            const rows = hours.map((h, i) => {
+                const below = Number(h) < (l.hourlyTarget || 0);
+                const reason = (l.reasons && l.reasons[i]) || '—';
+                const note = (l.reasonNotes && l.reasonNotes[i]) || '';
+                return `
+          <tr>
+            <td>H${i + 1}</td>
+            <td>${l.hourlyTarget || 0}</td>
+            <td>${h}</td>
+            <td><span class="pill-status ${below ? 'low' : 'ok'}">${below ? 'BELOW' : 'OK'}</span></td>
+            <td>${reason}</td>
+            <td>${note}</td>
+          </tr>
+        `;
+            }).join('');
+
+            document.getElementById('modalHourBody').innerHTML = rows;
+            document.getElementById('detailOverlay').classList.add('open');
+        };
+
+        function closeModal() {
+            document.getElementById('detailOverlay').classList.remove('open');
+        }
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+        document.getElementById('detailOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'detailOverlay') closeModal();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        // ---------- CSV EXPORT ----------
+        function exportCSV(logs) {
+            if (!logs.length) { showToast('Nothing to export for this view'); return; }
+            const header = ['Machine', 'Shift', 'Operator', 'Part', 'Target/Hr', 'Actual', 'Planned', 'Efficiency%', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'Downtime Events'];
+            const rows = logs.map(l => {
+                const hours = Array.isArray(l.hours) ? l.hours : [0, 0, 0, 0, 0, 0, 0, 0];
+                return [
+                    l.machineId, l.shift, l.operatorId, l.partName, l.hourlyTarget,
+                    l.actual, l.target, Math.round(l.efficiency), ...hours, l.downtimeCount
+                ].join(',');
+            });
+            const csv = [header.join(','), ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const urlObj = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = urlObj;
+            a.download = `production_${state.date}_shift-${state.shift}.csv`;
+            a.click();
+            URL.revokeObjectURL(urlObj);
+            showToast('📤 CSV exported');
+        }
+
+        // ---------- MASTER RENDER ----------
+        function renderAll() {
+            const logs = getFilteredLogs();
+            renderKPIs(logs);
+            renderGrid(logs);
+        }
+
+        // ---------- FILTER WIRING ----------
+        document.getElementById('dateFilter').value = state.date;
+        document.getElementById('dateFilter').addEventListener('change', (e) => {
+            state.date = e.target.value || todayStr();
+            renderAll();
+        });
+
+        document.getElementById('shiftChips').addEventListener('click', (e) => {
+            const btn = e.target.closest('.chip');
+            if (!btn) return;
+            document.querySelectorAll('#shiftChips .chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            state.shift = btn.dataset.shift;
+            renderAll();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            state.search = e.target.value;
+            renderAll();
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            state.sort = e.target.value;
+            renderAll();
+        });
+
+        document.getElementById('alertToggle').addEventListener('click', function () {
+            this.classList.toggle('on');
+            state.alertsOnly = this.classList.contains('on');
+            renderAll();
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', () => exportCSV(getFilteredLogs()));
+
+        // ---------- INIT ----------
+        (async function init() {
+            await loadMachineCount();
+            attachLiveListener();
+        })();
+    </script>
+</body>
+
+</html>

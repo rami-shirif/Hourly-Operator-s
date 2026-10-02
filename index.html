@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Terminal | Shift Ledger</title>
+
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- PRE-LOAD SCRIPT: Prevent Login Flash on Reload -->
+  <script>
+    (function () {
+      var meta = sessionStorage.getItem('activeSessionMeta');
+      if (meta) {
+        document.documentElement.classList.add('has-active-session');
+      }
+    })();
+  </script>
+
+  <style>
+    /* Instant hide overlay if session exists */
+    html.has-active-session #loginOverlay {
+      display: none !important;
+    }
+  </style>
+
+  <!-- ===================== THEME 1: SHIFT LEDGER (default) ===================== -->
+  <style id="themeLedger">
+    :root {
+      --yellow: #f4ce1e;
+      --yellow-deep: #e8bc0a;
+      --navy: #16223f;
+      --navy-soft: #2a3a5c;
+      --cream: #efe8da;
+      --paper: #faf6ec;
+      --brick: #b23a2e;
+      --gold: #b8912b;
+      --sage-bg: #cfe6cf;
+      --sage-ink: #2b5e3a;
+      --rose-bg: #f2cfc9;
+      --rose-ink: #8f3226;
+      --ink-dim: #6b6355;
+      --mono: 'JetBrains Mono', monospace;
+      --serif: 'Playfair Display', serif;
+      --neon-green: #2b5e3a;
+      --neon-red: #b23a2e;
+      --neon-yellow: #b8912b;
+      --neon-cyan: #b23a2e;
+      --text-dim: #6b6355;
+      --panel-border: #2a3a5c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--mono);
+    }
+
+    body {
+      background-color: var(--cream);
+      background-image:
+        linear-gradient(rgba(22, 34, 63, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22, 34, 63, 0.035) 1px, transparent 1px);
+      background-size: 34px 34px;
+      color: var(--navy);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::after {
+      content: 'LOG NO. SW-CNC-2026-A';
+      position: fixed;
+      bottom: 14px;
+      left: 20px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      color: rgba(22, 34, 63, 0.28);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--yellow);
+      border: 2px solid var(--navy);
+      padding: 18px 26px;
+      border-radius: 18px;
+      box-shadow: 5px 5px 0 var(--navy);
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--brick);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title i {
+      color: var(--navy);
+      font-style: normal;
+    }
+
+    .shift-info {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hud-badge {
+      background: var(--paper);
+      border: 1.5px solid var(--navy);
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .hud-badge span {
+      color: var(--brick);
+      font-weight: 700;
+    }
+
+    .hud-badge.badge-alert {
+      border: 1.5px solid var(--brick);
+      background: var(--rose-bg);
+      color: var(--rose-ink);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .hud-badge.badge-alert span {
+      color: var(--rose-ink);
+    }
+
+    .machine-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .machine-card {
+      position: relative;
+      background: var(--paper);
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 43px, rgba(22, 34, 63, 0.06) 43px, rgba(22, 34, 63, 0.06) 44px);
+      background-position: 0 128px;
+      border: 2px solid var(--navy);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 7px 7px 0 var(--gold);
+      overflow: hidden;
+    }
+
+    .login-box,
+    .modal-box {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .machine-card::before,
+    .login-box::before,
+    .modal-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 34px 34px 0;
+      border-color: transparent var(--yellow) transparent transparent;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--sage-ink);
+      box-shadow: 0 0 0 3px var(--sage-bg);
+      animation: livePulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.45;
+        transform: scale(0.75);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot {
+        animation: none;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed var(--navy-soft);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card-header>div:first-of-type {
+      /* Your styles here */
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-header-target {
+      font-family: var(--mono);
+      font-size: 0.75rem; 
+      color: var(--navy);
+      font-weight:700;
+    }
+
+    .machine-id {
+      font-family: var(--mono);
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 1px;
+      background: var(--yellow);
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      padding: 2px 12px;
+      display: inline-block;
+    }
+
+    .part-name-display {
+      width:100%;
+      color: var(--brick);
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 1.25rem;
+      text-align: left;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .part-name-display i {
+      color: var(--navy);
+      font-style: normal;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+      background: var(--cream);
+      padding: 20px;
+      border-radius: 14px;
+      border: 1.5px solid var(--navy-soft);
+    }
+
+    .metric-box {
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--mono);
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hours-grid {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .hour-pill {
+      background: var(--cream);
+      border: 1.5px solid var(--navy-soft);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hour-pill:focus-within {
+      border-color: var(--brick);
+      box-shadow: 3px 3px 0 var(--gold);
+    }
+
+    .hour-pill.below-target {
+      border-color: var(--rose-ink);
+      background: var(--rose-bg);
+    }
+
+    .hour-pill label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--ink-dim);
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .hour-pill.below-target label {
+      color: var(--rose-ink);
+    }
+
+    .hour-pill input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--navy);
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+
+    .reason-btn {
+      width: 100%;
+      margin-top: 8px;
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      font-weight: 700;
+      padding: 6px 4px;
+      border-radius: 6px;
+      border: 1.5px solid var(--rose-ink);
+      background: var(--paper);
+      color: var(--rose-ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .reason-btn:hover {
+      background: var(--rose-ink);
+      color: #fff;
+    }
+
+    .reason-btn.has-reason {
+      background: var(--rose-ink);
+      color: #fff;
+    }
+
+    .btn-action {
+      width: 100%;
+      background: var(--navy);
+      border: 2px solid var(--navy);
+      color: var(--yellow);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 17px;
+      border-radius: 999px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-action:hover {
+      background: var(--brick);
+      border-color: var(--brick);
+      transform: translateY(-2px);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-danger-outline {
+      width: 100%;
+      background: transparent;
+      border: 1.5px dashed var(--rose-ink);
+      color: var(--rose-ink);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--rose-bg);
+    }
+
+    .btn-switch {
+      background: var(--paper);
+      border: 1.5px solid var(--navy);
+      color: var(--navy);
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-switch:hover {
+      background: var(--navy);
+      color: var(--yellow);
+    }
+
+    .overlay-container {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 34, 63, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .login-box {
+      background: var(--paper);
+      border: 2px solid var(--navy);
+      box-shadow: 8px 8px 0 var(--yellow);
+      width: 460px;
+      max-width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 32px;
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.7rem;
+      margin-bottom: 4px;
+      color: var(--brick);
+    }
+
+    .field-group {
+      margin-top: 16px;
+      text-align: left;
+    }
+
+    .field-group label {
+      font-size: 0.72rem;
+      color: var(--brick);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--cream);
+      border: 1.5px solid var(--navy);
+      padding: 12px;
+      border-radius: 10px;
+      color: var(--navy);
+      font-family: var(--mono);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      margin-top: 6px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--brick);
+      box-shadow: 3px 3px 0 var(--yellow);
+    }
+
+    .selector-btn {
+      width: 100%;
+      background: var(--paper);
+      border: 2px solid var(--navy);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 3px 3px 0 var(--navy-soft);
+    }
+
+    .selector-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 5px 0 var(--brick);
+      border-color: var(--brick);
+    }
+
+    .selector-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--yellow);
+      border: 2px solid var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .selector-text {
+      flex: 1;
+      text-align: left;
+      min-width: 0;
+    }
+
+    .selector-text .sel-label {
+      font-size: 0.62rem;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .selector-text .sel-value {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--brick);
+      font-size: 0.95rem;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .selector-btn>i.fa-chevron-right {
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .shift-select {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .shift-btn {
+      background: var(--cream);
+      border: 1.5px solid var(--navy);
+      border-radius: 10px;
+      padding: 12px 0;
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .shift-btn:hover {
+      background: var(--yellow);
+    }
+
+    .shift-btn.active {
+      background: var(--navy);
+      color: var(--yellow);
+      border-color: var(--navy);
+      box-shadow: 2px 2px 0 var(--gold);
+    }
+
+    .modal-box {
+      background: var(--paper);
+      border: 2px solid var(--navy);
+      box-shadow: 8px 8px 0 var(--yellow);
+      width: 550px;
+      max-width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 28px;
+      border-radius: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px dashed var(--navy-soft);
+      padding-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.4rem;
+      color: var(--brick);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--ink-dim);
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .close-btn:hover {
+      color: var(--brick);
+    }
+
+    .popup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .popup-grid.popup-grid-parts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .popup-grid.popup-grid-reasons {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .popup-card {
+      background: var(--cream);
+      border: 1.5px solid var(--navy-soft);
+      min-height: 80px;
+      border-radius: 12px;
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .popup-card:hover {
+      border-color: var(--brick);
+      transform: translateY(-3px);
+      box-shadow: 3px 3px 0 var(--yellow);
+      background: var(--paper);
+    }
+
+    .popup-card.active {
+      border-color: var(--sage-ink);
+      background: var(--sage-bg);
+      box-shadow: 3px 3px 0 var(--sage-ink);
+    }
+
+    .popup-card-title {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--navy);
+      margin-bottom: 4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      line-height: 1.25;
+    }
+
+    .popup-card-sub {
+      font-size: 11px;
+      color: var(--ink-dim);
+      overflow-wrap: break-word;
+    }
+
+    .popup-card-tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--yellow);
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      white-space: nowrap;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 0.78rem;
+      color: var(--ink-dim);
+      font-weight: 600;
+      flex-wrap: wrap;
+    }
+
+    .legend-chip {
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: 0.3px;
+    }
+
+    .legend-chip.on {
+      background: var(--sage-bg);
+      color: var(--sage-ink);
+    }
+
+    .legend-chip.off {
+      background: var(--rose-bg);
+      color: var(--rose-ink);
+    }
+
+    .error-msg {
+      color: var(--brick);
+      font-size: 0.85rem;
+      margin-top: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--navy);
+      border: 2px solid var(--yellow);
+      color: var(--yellow);
+      box-shadow: 5px 5px 0 var(--brick);
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      display: none;
+      z-index: 10000;
+      max-width: calc(100vw - 40px);
+    }
+  </style>
+
+  <!-- ===================== THEME 2: CYBER HUD (toggle) ===================== -->
+  <style id="themeCyber" disabled>
+    :root {
+      --bg-dark: #060a12;
+      --panel-bg: rgba(15, 23, 42, 0.85);
+      --panel-border: #1e3a5f;
+      --neon-cyan: #00f0ff;
+      --neon-green: #00ff66;
+      --neon-yellow: #ffb700;
+      --neon-red: #ff0055;
+      --text-main: #e2e8f0;
+      --text-dim: #64748b;
+      --mono: 'JetBrains Mono', monospace;
+      --navy: #e2e8f0;
+      --cream: rgba(0, 0, 0, 0.5);
+      --paper: rgba(15, 23, 42, 0.85);
+      --brick: #00f0ff;
+      --yellow: #0f172a;
+      --gold: #00f0ff;
+      --sage-bg: rgba(0, 255, 102, 0.1);
+      --sage-ink: #00ff66;
+      --rose-bg: rgba(255, 0, 85, 0.12);
+      --rose-ink: #ff0055;
+      --ink-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image:
+        linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 15% 10%, rgba(0, 240, 255, 0.09) 0%, transparent 30%),
+        radial-gradient(circle at 85% 90%, rgba(0, 255, 102, 0.06) 0%, transparent 30%);
+      background-size: 42px 42px, 42px 42px, auto, auto;
+      background-position: -1px -1px, -1px -1px, 0 0, 0 0;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::after {
+      content: 'X+000.000  Y+000.000  Z+120.500';
+      position: fixed;
+      bottom: 14px;
+      left: 20px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: rgba(100, 116, 139, 0.35);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.1);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title i {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    .shift-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hud-badge {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--panel-border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-badge span {
+      color: var(--neon-cyan);
+      font-weight: 700;
+    }
+
+    .hud-badge.badge-alert {
+      border: 1px solid var(--neon-red);
+      color: var(--neon-red);
+      cursor: pointer;
+    }
+
+    .hud-badge.badge-alert span {
+      color: var(--neon-red);
+    }
+
+    .machine-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .machine-card {
+      position: relative;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .login-box,
+    .modal-box {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .machine-card::before,
+    .login-box::before,
+    .modal-box::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      pointer-events: none;
+      z-index: 2;
+      background-image:
+        linear-gradient(var(--neon-cyan), var(--neon-cyan)), linear-gradient(var(--neon-cyan), var(--neon-cyan)),
+        linear-gradient(var(--neon-cyan), var(--neon-cyan)), linear-gradient(var(--neon-cyan), var(--neon-cyan)),
+        linear-gradient(var(--neon-cyan), var(--neon-cyan)), linear-gradient(var(--neon-cyan), var(--neon-cyan)),
+        linear-gradient(var(--neon-cyan), var(--neon-cyan)), linear-gradient(var(--neon-cyan), var(--neon-cyan));
+      background-repeat: no-repeat;
+      background-size: 2px 18px, 18px 2px, 2px 18px, 18px 2px, 2px 18px, 18px 2px, 2px 18px, 18px 2px;
+      background-position: top left, top left, top right, top right, bottom left, bottom left, bottom right, bottom right;
+      opacity: 0.55;
+    }
+
+    .machine-card::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 120px;
+      top: -120px;
+      background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.06), transparent);
+      animation: scanSweep 6s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes scanSweep {
+      0% {
+        top: -120px;
+      }
+
+      100% {
+        top: 100%;
+      }
+    }
+
+    .machine-card>* {
+      position: relative;
+      z-index: 3;
+    }
+
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon-green);
+      box-shadow: 0 0 8px var(--neon-green);
+      animation: livePulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .machine-card::after {
+        animation: none;
+        display: none;
+      }
+
+      .live-dot {
+        animation: none;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .machine-id {
+      font-family: var(--mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .part-name-display {
+      color: var(--neon-cyan);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .metric-box {
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--mono);
+      font-size: 2.4rem;
+      font-weight: 700;
+    }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hours-grid {
+      width: 100%;
+      height: auto;
+      display: grid;
+      grid-template-row: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .hour-pill {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hour-pill:focus-within {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    }
+
+    .hour-pill.below-target {
+      border-color: var(--neon-red);
+      background: rgba(255, 0, 85, 0.08);
+    }
+
+    .hour-pill label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hour-pill.below-target label {
+      color: var(--neon-red);
+    }
+
+    .hour-pill input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .reason-btn {
+      width: 100%;
+      margin-top: 8px;
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      font-weight: 700;
+      padding: 6px 4px;
+      border-radius: 6px;
+      border: 1px solid var(--neon-red);
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--neon-red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .reason-btn:hover {
+      background: var(--neon-red);
+      color: #000;
+    }
+
+    .reason-btn.has-reason {
+      background: var(--neon-red);
+      color: #000;
+    }
+
+    .btn-action {
+      width: 100%;
+      background: linear-gradient(135deg, var(--neon-cyan), #0284c7);
+      border: none;
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-action:hover {
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+      transform: scale(1.01);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-danger-outline {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed var(--neon-red);
+      color: var(--neon-red);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 11px;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-danger-outline:hover {
+      background: rgba(255, 0, 85, 0.08);
+    }
+
+    .btn-switch {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text-dim);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-switch:hover {
+      color: #fff;
+      border-color: var(--neon-cyan);
+    }
+
+    .overlay-container {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 16, 0.94);
+      backdrop-filter: blur(16px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .login-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 40px rgba(0, 240, 255, 0.2);
+      width: 460px;
+      max-width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 32px;
+      border-radius: 24px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .field-group {
+      margin-top: 16px;
+      text-align: left;
+    }
+
+    .field-group label {
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--panel-border);
+      padding: 12px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      margin-top: 6px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    .selector-btn {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .selector-btn:hover {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.05);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    }
+
+    .selector-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--neon-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--neon-cyan);
+      font-size: 1rem;
+    }
+
+    .selector-text {
+      flex: 1;
+      text-align: left;
+      min-width: 0;
+    }
+
+    .selector-text .sel-label {
+      font-size: 0.62rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .selector-text .sel-value {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--neon-cyan);
+      font-size: 0.95rem;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .selector-btn>i.fa-chevron-right {
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .shift-select {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .shift-btn {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 12px 0;
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .shift-btn:hover {
+      border-color: var(--neon-cyan);
+    }
+
+    .shift-btn.active {
+      background: var(--neon-cyan);
+      color: #000;
+      border-color: var(--neon-cyan);
+    }
+
+    .modal-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.25);
+      width: 550px;
+      max-width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 28px;
+      border-radius: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .close-btn:hover {
+      color: var(--neon-red);
+    }
+
+    .popup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .popup-grid.popup-grid-parts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .popup-grid.popup-grid-reasons {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .popup-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--panel-border);
+      min-height: 80px;
+      border-radius: 14px;
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .popup-card:hover {
+      border-color: var(--neon-cyan);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0, 240, 255, 0.2);
+      background: rgba(0, 240, 255, 0.05);
+    }
+
+    .popup-card.active {
+      border-color: var(--neon-green);
+      background: rgba(0, 255, 102, 0.08);
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+    }
+
+    .popup-card-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      line-height: 1.3;
+    }
+
+    .popup-card-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      overflow-wrap: break-word;
+    }
+
+    .popup-card-tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      white-space: nowrap;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      flex-wrap: wrap;
+    }
+
+    .legend-chip {
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: 0.3px;
+    }
+
+    .legend-chip.on {
+      background: rgba(0, 255, 102, 0.12);
+      color: var(--neon-green);
+    }
+
+    .legend-chip.off {
+      background: rgba(255, 0, 85, 0.12);
+      color: var(--neon-red);
+    }
+
+    .error-msg {
+      color: var(--neon-red);
+      font-size: 0.85rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(19, 30, 49, 0.95);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      display: none;
+      z-index: 10000;
+      max-width: calc(100vw - 40px);
+    }
+  </style>
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem('terminalTheme') || 'ledger';
+      document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('themeCyber').disabled = (saved !== 'cyber');
+        document.getElementById('themeLedger').disabled = (saved === 'cyber');
+      });
+    })();
+  </script>
+</head>
+
+<body>
+
+  <!-- LOGIN OVERLAY -->
+  <div id="loginOverlay" class="overlay-container">
+    <div class="login-box">
+      <i class="fa-solid fa-clipboard-list" style="font-size: 2.6rem; color: var(--navy); margin-bottom: 8px;"></i>
+      <h2>LOGIN</h2>
+      <p style="color: var(--ink-dim); font-size: 0.85rem; font-weight: 600;">CITIC DICASTAL &mdash; PRODUCTION HOURS
+      </p>
+
+      <div class="field-group">
+        <label>MACHINE</label>
+        <button class="selector-btn" onclick="openMachineModal()">
+          <span class="selector-icon"><i class="fa-solid fa-server"></i></span>
+          <span class="selector-text">
+            <span class="sel-label">Machine SW</span>
+            <span class="sel-value" id="selectedMachineText">Loading...</span>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label>PART</label>
+        <button class="selector-btn" onclick="openPartModal()">
+          <span class="selector-icon"><i class="fa-solid fa-gear"></i></span>
+          <span class="selector-text">
+            <span class="sel-label">Target Part</span>
+            <span class="sel-value" id="selectedPartText">Loading...</span>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label>SHIFT</label>
+        <div class="shift-select" id="shiftSelect">
+          <button type="button" class="shift-btn" data-shift="A" onclick="selectShift('A')">A</button>
+          <button type="button" class="shift-btn" data-shift="B" onclick="selectShift('B')">B</button>
+          <button type="button" class="shift-btn" data-shift="C" onclick="selectShift('C')">C</button>
+          <button type="button" class="shift-btn" data-shift="D" onclick="selectShift('D')">D</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="pinInput">OPERATOR PIN (MATRICULATION)</label>
+        <input type="tel" id="pinInput" class="input-field" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+          placeholder="e.g. 611" autocomplete="off">
+      </div>
+
+      <div id="loginError" class="error-msg">Enter your matriculation PIN.</div>
+
+      <button class="btn-action" id="startShiftBtn" style="margin-top: 20px;" onclick="handleOperatorLogin()">
+        START SHIFT <i class="fa-solid fa-bolt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SELECT MACHINE MODAL -->
+  <div id="machineModal" class="overlay-container" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-server"></i> SELECT MACHINE</h3>
+        <button class="close-btn" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="popup-grid" id="machineListGrid">
+        <p style="color: var(--ink-dim, var(--text-dim));">Fetching machines from Realtime DB...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECT PART MODAL -->
+  <div id="partModal" class="overlay-container" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gear"></i> SELECT PART</h3>
+        <button class="close-btn" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="popup-grid popup-grid-parts" id="partListGrid">
+        <p style="color: var(--ink-dim, var(--text-dim));">Fetching parts from Realtime DB...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM DOWNTIME REASON MODAL -->
+  <div id="reasonModal" class="overlay-container" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> DOWNTIME REASON<span
+            id="modalHourTarget">1</span></h3>
+        <button class="close-btn" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="field-group" style="margin-top: 0; margin-bottom: 16px;">
+        <label>SELECT CATEGORY</label>
+      </div>
+
+      <div class="popup-grid popup-grid-reasons" id="reasonGrid">
+        <!-- Built dynamically via JS -->
+      </div>
+
+      <div class="field-group" style="margin-top: 20px;">
+        <label for="customNoteInput">OPTIONAL NOTES / REMARKS</label>
+        <input type="text" id="customNoteInput" class="input-field"
+          placeholder="e.g. Spindle overheating, line stoppage..." autocomplete="off">
+      </div>
+
+
+      <div style="display: flex; gap: 10px; margin-top: 24px;">
+        <button class="btn-action" style="flex: 2; font-size: 0.85rem; padding: 12px;" onclick="saveSelectedReason()">
+          SAVE REASON <i class="fa-solid fa-check"></i>
+        </button>
+        <button class="btn-danger-outline" style="flex: 1; margin-top: 0; font-size: 0.75rem; padding: 12px;"
+          onclick="clearSelectedReason()">
+          CANCEL
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="shift-info">
+      <div class="hud-badge"><span class="live-dot"></span>&nbsp;LIVE</div>
+      <div class="hud-badge"><i class="fa-regular fa-calendar"></i> <span id="currentDate">--</span></div>
+      <div class="hud-badge"><i class="fa-solid fa-clock"></i> SHIFT <span id="currentShift">-</span></div>
+      <div class="hud-badge"><i class="fa-solid fa-user-gear"></i> OP ID: <span id="operatorDisplay">---</span></div>
+      <button class="hud-badge badge-alert" id="queueBadge" style="display:none;" onclick="flushQueue()">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span id="queueCount">0</span> PENDING &middot; TAP TO RETRY
+      </button>
+      <button class="btn-switch" id="themeToggleBtn" onclick="toggleTheme()"><i class="fa-solid fa-swatchbook"></i>
+        Theme</button>
+      <button class="btn-switch" onclick="logoutOperator()"><i
+          class="fa-solid fa-right-from-bracket"></i>Logout</button>
+    </div>
+  </header>
+
+  <main class="machine-container">
+    <div class="machine-card" id="activeMachineCard"></div>
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- FIREBASE REALTIME DATABASE SDK INTEGRATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUKx8KLmsgXyekDSPyga-DCupOr2e_bSg",
+      authDomain: "hourly-users-57fe1.firebaseapp.com",
+      databaseURL: "https://hourly-users-57fe1-default-rtdb.firebaseio.com",
+      projectId: "hourly-users-57fe1",
+      storageBucket: "hourly-users-57fe1.firebasestorage.app",
+      messagingSenderId: "538548762721",
+      appId: "1:538548762721:web:303256450853d0d7bbd220"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.REASON_PRESETS = [
+      { id: 'Tool Change', icon: 'fa-screwdriver-wrench', label: 'Tool Change' },
+      { id: 'NOK Parts', icon: 'fa-circle-xmark', label: 'NOK Parts' },
+      { id: 'Material Wait', icon: 'fa-boxes-packing', label: 'Material Wait' },
+      { id: 'Maintenance', icon: 'fa-gears', label: 'Maintenance' },
+      { id: 'Setup Adjust', icon: 'fa-sliders', label: 'Setup / Adjust' },
+      { id: 'Other', icon: 'fa-ellipsis-h', label: 'Other Reason' }
+    ];
+
+    window.dbMachines = [];
+    window.dbParts = [];
+
+    window.currentSession = {
+      operatorId: "---",
+      machineId: "",
+      partName: "",
+      target: 18,
+      shift: "A",
+      hours: [0, 0, 0, 0, 0, 0, 0, 0],
+      reasons: {},
+      reasonNotes: {}
+    };
+
+    window.pendingQueue = [];
+
+    window.getTodayDateStr = function () {
+      return new Date().toISOString().split('T')[0];
+    };
+
+    window.initializeDateTime = function () {
+      const now = new Date();
+      document.getElementById('currentDate').innerText = window.getTodayDateStr();
+      const hour = now.getHours();
+      let shift = 'C';
+      if (hour >= 6 && hour < 14) shift = 'A';
+      else if (hour >= 14 && hour < 22) shift = 'B';
+      return { dateStr: window.getTodayDateStr(), shift };
+    };
+
+    function buildLogKey(dateStr, shift, machineId, operatorId) {
+      const cleanMachine = machineId.replace(/\s+/g, '');
+      return `${dateStr}_Shift${shift}_${cleanMachine}_${operatorId}`;
+    }
+
+    window.updateQueueBadge = function () {
+      const badge = document.getElementById('queueBadge');
+      const count = document.getElementById('queueCount');
+      if (!badge) return;
+      if (window.pendingQueue.length > 0) {
+        badge.style.display = 'inline-flex';
+        count.innerText = window.pendingQueue.length;
+      } else {
+        badge.style.display = 'none';
+      }
+    };
+
+    function enqueuePending(logKey, payload) {
+      const idx = window.pendingQueue.findIndex(item => item.logKey === logKey);
+      if (idx >= 0) window.pendingQueue[idx] = { logKey, payload };
+      else window.pendingQueue.push({ logKey, payload });
+      window.updateQueueBadge();
+    }
+
+    window.flushQueue = async function () {
+      if (!window.pendingQueue.length) {
+        showToast('✅ Nothing pending — already in sync');
+        return;
+      }
+      const remaining = [];
+      for (const item of window.pendingQueue) {
+        try {
+          await set(ref(db, 'daily_logs/' + item.logKey), item.payload);
+        } catch (err) {
+          remaining.push(item);
+        }
+      }
+      window.pendingQueue = remaining;
+      window.updateQueueBadge();
+      showToast(remaining.length ? `⚠️ ${remaining.length} entr${remaining.length === 1 ? 'y' : 'ies'} still pending` : '⚡ All queued entries synced');
+    };
+
+    window.addEventListener('online', () => window.flushQueue());
+
+    async function loadDatabaseCatalogs() {
+      try {
+        const machinesSnap = await get(ref(db, 'machines'));
+        window.dbMachines = machinesSnap.exists() ? Object.values(machinesSnap.val()) : [
+          { id: "MSA 01", type: "Multi-Spindle CNC", target: 18 },
+          { id: "MSA 02", type: "Multi-Spindle CNC", target: 20 }
+        ];
+
+        const partsSnap = await get(ref(db, 'parts'));
+        window.dbParts = partsSnap.exists() ? Object.values(partsSnap.val()) : [
+          { name: "T-Opal Front", code: "P-8821", target: 18 },
+          { name: "T-Opal Rear", code: "P-8822", target: 20 }
+        ];
+
+        if (!window.currentSession.machineId && window.dbMachines.length > 0) {
+          window.currentSession.machineId = window.dbMachines[0].id;
+        }
+        if (!window.currentSession.partName && window.dbParts.length > 0) {
+          window.currentSession.partName = window.dbParts[0].name;
+          window.currentSession.target = window.dbParts[0].target || 18;
+        }
+
+        document.getElementById('selectedMachineText').innerText = window.currentSession.machineId;
+        document.getElementById('selectedPartText').innerText = window.currentSession.partName;
+      } catch (err) {
+        console.error("Error fetching catalog from DB:", err);
+      }
+    }
+
+    window.renderSingleMachine = function () {
+      const container = document.getElementById('activeMachineCard');
+      const s = window.currentSession;
+      s.reasons = s.reasons || {};
+      s.reasonNotes = s.reasonNotes || {};
+
+      const totalActual = s.hours.reduce((acc, curr) => acc + Math.max(0, Number(curr) || 0), 0);
+      const totalTarget = s.target * 8;
+      const efficiency = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+
+      let statusColor = 'var(--neon-green)';
+      if (efficiency < 85) statusColor = 'var(--neon-red)';
+      else if (efficiency < 98) statusColor = 'var(--neon-yellow)';
+
+      let hourPills = '';
+      for (let h = 0; h < 8; h++) {
+        const belowTarget = Number(s.hours[h]) < s.target;
+        const currentReason = s.reasons[h] || '';
+        hourPills += `
+          <div class="hour-pill ${belowTarget ? 'below-target' : ''}" id="hourPill-${h}">
+            <label>HOUR ${h + 1}</label>
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" data-hour="${h}" value="${s.hours[h]}"
+                   oninput="handleHourInput(${h}, this)" onblur="handleHourBlur(${h})">
+            <div class="reason-wrap" id="reasonWrap-${h}">
+              ${belowTarget ? buildReasonBtn(h, currentReason) : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="machine-id">${s.machineId}</div>
+            <div class="card-header-target">
+             <span> TARGET: ${s.target}/HR</span>
+            </div>
+          </div>
+        
+          <div class="part-name-display"><i class="fa-solid fa-gear"></i> ${s.partName}</div>
+
+        </div>
+
+
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val" id="totalActualVal" style="color: var(--neon-cyan)">${totalActual}</div>
+            <div class="metric-label">Actual Produced</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="totalTargetVal">${totalTarget}</div>
+            <div class="metric-label">Shift Target</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="efficiencyVal" style="color: ${statusColor}">${efficiency}%</div>
+            <div class="metric-label">Efficiency (OEE)</div>
+          </div>
+        </div>
+
+        <div class="hours-grid">
+          ${hourPills}
+        </div>
+
+        <button id="syncBtn" class="btn-action" onclick="saveCurrentMachineData()">
+          SAVE DATA<i class="fa-solid fa-cloud-arrow-up"></i>
+        </button>
+        <button class="btn-danger-outline" onclick="clearMachineData()">
+          <i class="fa-solid fa-trash-can"></i> CLEAR FOR NEXT SHIFT
+        </button>
+      `;
+    };
+
+    function buildReasonBtn(h, currentReason) {
+      const hasReason = Boolean(currentReason);
+      const displayText = hasReason ? currentReason : 'SELECT REASON';
+      return `
+        <button type="button" class="reason-btn ${hasReason ? 'has-reason' : ''}" onclick="openReasonModal(${h})">
+          <i class="fa-solid ${hasReason ? 'fa-pen-to-square' : 'fa-triangle-exclamation'}"></i> ${displayText}
+        </button>
+      `;
+    }
+
+    window.updateMetricsDisplay = function () {
+      const s = window.currentSession;
+      const totalActual = s.hours.reduce((acc, curr) => acc + Math.max(0, Number(curr) || 0), 0);
+      const totalTarget = s.target * 8;
+      const efficiency = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+      let statusColor = 'var(--neon-green)';
+      if (efficiency < 85) statusColor = 'var(--neon-red)';
+      else if (efficiency < 98) statusColor = 'var(--neon-yellow)';
+
+      const totalActualEl = document.getElementById('totalActualVal');
+      const totalTargetEl = document.getElementById('totalTargetVal');
+      const efficiencyEl = document.getElementById('efficiencyVal');
+      const statusDot = document.getElementById('statusDot');
+      if (totalActualEl) totalActualEl.innerText = totalActual;
+      if (totalTargetEl) totalTargetEl.innerText = totalTarget;
+      if (efficiencyEl) { efficiencyEl.innerText = efficiency + '%'; efficiencyEl.style.color = statusColor; }
+      if (statusDot) { statusDot.style.color = statusColor; statusDot.style.textShadow = `0 0 15px ${statusColor}`; }
+    };
+
+    window.updateHourPillUI = function (h) {
+      const s = window.currentSession;
+      const belowTarget = Number(s.hours[h]) < s.target;
+      const pill = document.getElementById('hourPill-' + h);
+      const reasonWrap = document.getElementById('reasonWrap-' + h);
+      if (pill) pill.classList.toggle('below-target', belowTarget);
+      if (reasonWrap) reasonWrap.innerHTML = belowTarget ? buildReasonBtn(h, s.reasons[h]) : '';
+    };
+
+    window.updateSessionTarget = function (newTarget) {
+      window.currentSession.target = Math.max(1, Number(newTarget) || 1);
+      window.renderSingleMachine();
+      window.scheduleAutoSave();
+    };
+
+    window.handleHourInput = function (h, el) {
+      let raw = el.value.replace(/[^0-9]/g, '');
+      if (raw.length > 1) raw = raw.replace(/^0+/, '') || '0';
+      if (raw.length > 3) raw = raw.slice(0, 3);
+      el.value = raw;
+      const num = raw === '' ? 0 : parseInt(raw, 10);
+      window.currentSession.hours[h] = num;
+      window.updateMetricsDisplay();
+      window.scheduleAutoSave();
+      if (raw.length >= 2) {
+        const next = document.querySelector(`input[data-hour="${h + 1}"]`);
+        if (next) next.focus();
+      }
+    };
+
+    window.handleHourBlur = function (h) {
+      window.updateHourPillUI(h);
+    };
+
+    let autoSaveTimer = null;
+    window.scheduleAutoSave = function () {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => { window.saveCurrentMachineData(true); }, 1000);
+    };
+
+    window.saveCurrentMachineData = async function (silent) {
+      const s = window.currentSession;
+      if (!s.machineId || !s.operatorId || s.operatorId === '---') return;
+
+      const btn = document.getElementById('syncBtn');
+      let originalText;
+      if (!silent && btn) {
+        originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'SAVING... <i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.style.opacity = '0.7';
+      }
+
+      const dateStr = window.getTodayDateStr();
+      const logKey = buildLogKey(dateStr, s.shift, s.machineId, s.operatorId);
+
+      const payload = {
+        date: dateStr,
+        shift: s.shift,
+        machineId: s.machineId,
+        partName: s.partName,
+        operatorId: s.operatorId,
+        hourlyTarget: s.target,
+        hours: s.hours,
+        reasons: s.reasons || {},
+        reasonNotes: s.reasonNotes || {},
+        totalPlan: s.target * 8,
+        totalActual: s.hours.reduce((a, b) => a + Number(b), 0),
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        await set(ref(db, 'daily_logs/' + logKey), payload);
+        sessionStorage.setItem('activeSessionMeta', JSON.stringify({
+          operatorId: s.operatorId,
+          machineId: s.machineId,
+          partName: s.partName,
+          shift: s.shift
+        }));
+        if (!silent) showToast(`⚡ Realtime DB Updated: ${s.machineId} (${s.partName})`);
+      } catch (err) {
+        console.error(err);
+        enqueuePending(logKey, payload);
+        if (!silent) showToast(`📥 Offline — entry queued (${window.pendingQueue.length} pending)`);
+      } finally {
+        if (!silent && btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      }
+    };
+
+    window.clearMachineData = async function () {
+      const s = window.currentSession;
+      if (!confirm(`Clear ${s.machineId}'s saved hours for this shift so the next operator starts fresh? This deletes the database entry and cannot be undone.`)) return;
+
+      const dateStr = window.getTodayDateStr();
+      const logKey = buildLogKey(dateStr, s.shift, s.machineId, s.operatorId);
+
+      try {
+        await remove(ref(db, 'daily_logs/' + logKey));
+        s.hours = [0, 0, 0, 0, 0, 0, 0, 0];
+        s.reasons = {};
+        s.reasonNotes = {};
+        window.renderSingleMachine();
+        showToast(`🗑️ ${s.machineId} cleared for next shift`);
+      } catch (err) {
+        console.error(err);
+        showToast(`❌ Clear failed: ${err.message}`);
+      }
+    };
+
+    window.handleOperatorLogin = async function () {
+      const pinEl = document.getElementById('pinInput');
+      const mat = (pinEl.value || '').trim();
+      const error = document.getElementById('loginError');
+      const startBtn = document.getElementById('startShiftBtn');
+
+      if (mat === '') {
+        error.innerText = 'Enter your matriculation PIN.';
+        error.style.display = 'block';
+        return;
+      }
+      if (!window.currentSession.machineId) {
+        error.innerText = 'Still loading machine list — try again in a moment.';
+        error.style.display = 'block';
+        return;
+      }
+      error.style.display = 'none';
+
+      const shift = window.selectedShift || 'A';
+      const dateStr = window.getTodayDateStr();
+      const logKey = buildLogKey(dateStr, shift, window.currentSession.machineId, mat);
+
+      startBtn.disabled = true;
+      const originalBtnHtml = startBtn.innerHTML;
+      startBtn.innerHTML = 'LOADING SHIFT DATA... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+      window.currentSession.operatorId = mat;
+      window.currentSession.shift = shift;
+
+      try {
+        const snap = await get(ref(db, 'daily_logs/' + logKey));
+        if (snap.exists()) {
+          const existing = snap.val();
+          window.currentSession.hours = existing.hours || [0, 0, 0, 0, 0, 0, 0, 0];
+          window.currentSession.reasons = existing.reasons || {};
+          window.currentSession.reasonNotes = existing.reasonNotes || {};
+          window.currentSession.target = existing.hourlyTarget || window.currentSession.target;
+          if (existing.partName) window.currentSession.partName = existing.partName;
+          showToast(`🔄 Restored saved shift data for ${window.currentSession.machineId}`);
+        } else {
+          window.currentSession.hours = [0, 0, 0, 0, 0, 0, 0, 0];
+          window.currentSession.reasons = {};
+          window.currentSession.reasonNotes = {};
+        }
+      } catch (err) {
+        console.error('Could not fetch existing log:', err);
+        window.currentSession.hours = window.currentSession.hours || [0, 0, 0, 0, 0, 0, 0, 0];
+        window.currentSession.reasons = window.currentSession.reasons || {};
+        window.currentSession.reasonNotes = window.currentSession.reasonNotes || {};
+        showToast('⚠️ Could not reach the database — starting blank for now');
+      }
+
+      sessionStorage.setItem('activeSessionMeta', JSON.stringify({
+        operatorId: mat,
+        machineId: window.currentSession.machineId,
+        partName: window.currentSession.partName,
+        shift: shift
+      }));
+      document.documentElement.classList.add('has-active-session');
+
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('operatorDisplay').innerText = mat;
+      document.getElementById('currentShift').innerText = shift;
+      window.renderSingleMachine();
+
+      startBtn.disabled = false;
+      startBtn.innerHTML = originalBtnHtml;
+    };
+
+    async function tryRestoreSession() {
+      const storedMeta = sessionStorage.getItem('activeSessionMeta');
+      if (!storedMeta) return false;
+
+      try {
+        const meta = JSON.parse(storedMeta);
+        const dateStr = window.getTodayDateStr();
+        const logKey = buildLogKey(dateStr, meta.shift, meta.machineId, meta.operatorId);
+
+        window.currentSession.operatorId = meta.operatorId;
+        window.currentSession.machineId = meta.machineId;
+        window.currentSession.partName = meta.partName;
+        window.currentSession.shift = meta.shift;
+        document.getElementById('operatorDisplay').innerText = meta.operatorId;
+        document.getElementById('currentShift').innerText = meta.shift;
+        document.getElementById('loginOverlay').style.display = 'none';
+        window.renderSingleMachine();
+
+        const snap = await get(ref(db, 'daily_logs/' + logKey));
+        if (snap.exists()) {
+          const existing = snap.val();
+          window.currentSession.hours = existing.hours || [0, 0, 0, 0, 0, 0, 0, 0];
+          window.currentSession.reasons = existing.reasons || {};
+          window.currentSession.reasonNotes = existing.reasonNotes || {};
+          window.currentSession.target = existing.hourlyTarget || 18;
+          window.renderSingleMachine();
+        }
+        showToast(`🔄 Auto-restored active session (${meta.machineId})`);
+        return true;
+      } catch (err) {
+        console.error('Session auto-restore error:', err);
+      }
+      return false;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const suggested = window.initializeDateTime();
+      document.getElementById('currentShift').innerText = suggested.shift;
+      await loadDatabaseCatalogs();
+      window.updateQueueBadge();
+      window.selectShift(suggested.shift);
+
+      const restored = await tryRestoreSession();
+      if (!restored) {
+        document.documentElement.classList.remove('has-active-session');
+        document.getElementById('loginOverlay').style.display = 'flex';
+      }
+    });
+  </script>
+
+  <!-- UI HANDLERS: MODALS, REASONS, SHIFT SELECT, LOGOUT, THEME TOGGLE -->
+  <script>
+    let activeModalHour = 0;
+    let tempSelectedReason = '';
+
+    function openReasonModal(h) {
+      activeModalHour = h;
+      document.getElementById('modalHourTarget').innerText = h + 1;
+
+      const currentReason = (window.currentSession.reasons && window.currentSession.reasons[h]) || '';
+      const currentNote = (window.currentSession.reasonNotes && window.currentSession.reasonNotes[h]) || '';
+      tempSelectedReason = currentReason;
+
+      document.getElementById('customNoteInput').value = currentNote;
+      renderReasonGrid();
+      document.getElementById('reasonModal').style.display = 'flex';
+    }
+
+    function renderReasonGrid() {
+      const grid = document.getElementById('reasonGrid');
+      grid.innerHTML = window.REASON_PRESETS.map(r => `
+        <div class="popup-card ${r.id === tempSelectedReason ? 'active' : ''}" onclick="selectReasonPreset('${r.id}')">
+          <i class="fa-solid ${r.icon}" style="font-size: 1.4rem; margin-bottom: 6px; color: var(--brick);"></i>
+          <div class="popup-card-title">${r.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectReasonPreset(reasonId) {
+      tempSelectedReason = reasonId;
+      renderReasonGrid();
+    }
+
+    function saveSelectedReason() {
+      const note = document.getElementById('customNoteInput').value.trim();
+
+      window.currentSession.reasons = window.currentSession.reasons || {};
+      window.currentSession.reasonNotes = window.currentSession.reasonNotes || {};
+
+      if (tempSelectedReason) {
+        window.currentSession.reasons[activeModalHour] = tempSelectedReason;
+      } else {
+        delete window.currentSession.reasons[activeModalHour];
+      }
+
+      if (note) {
+        window.currentSession.reasonNotes[activeModalHour] = note;
+      } else {
+        delete window.currentSession.reasonNotes[activeModalHour];
+      }
+
+      window.updateHourPillUI(activeModalHour);
+      closeModals();
+      window.scheduleAutoSave();
+    }
+
+    function clearSelectedReason() {
+      window.currentSession.reasons = window.currentSession.reasons || {};
+      window.currentSession.reasonNotes = window.currentSession.reasonNotes || {};
+
+      delete window.currentSession.reasons[activeModalHour];
+      delete window.currentSession.reasonNotes[activeModalHour];
+
+      window.updateHourPillUI(activeModalHour);
+      closeModals();
+      window.scheduleAutoSave();
+    }
+
+    function openMachineModal() {
+      const grid = document.getElementById('machineListGrid');
+      grid.innerHTML = window.dbMachines.map(m => `
+        <div class="popup-card ${m.id === window.currentSession.machineId ? 'active' : ''}" onclick="selectMachine('${m.id}')">
+          <div class="popup-card-title">${m.id}</div>
+        </div>
+      `).join('');
+      document.getElementById('machineModal').style.display = 'flex';
+    }
+
+    function openPartModal() {
+      const grid = document.getElementById('partListGrid');
+      grid.innerHTML = window.dbParts.map(p => `
+        <div class="popup-card ${p.name === window.currentSession.partName ? 'active' : ''}" onclick="selectPart('${p.name}', ${p.target})">
+          <div class="popup-card-title">${p.name}</div>
+          <div class="popup-card-sub">${p.code ? 'SKU: ' + p.code : ''}</div>
+          <span class="popup-card-tag"><i class="fa-solid fa-sliders"></i> Target: ${p.target}</span>
+        </div>
+      `).join('');
+      document.getElementById('partModal').style.display = 'flex';
+    }
+
+    function selectMachine(mId) {
+      window.currentSession.machineId = mId;
+      document.getElementById('selectedMachineText').innerText = mId;
+      closeModals();
+    }
+
+    function selectPart(pName, pTarget) {
+      window.currentSession.partName = pName;
+      window.currentSession.target = pTarget || 18;
+      document.getElementById('selectedPartText').innerText = pName;
+      closeModals();
+    }
+
+    function closeModals() {
+      document.getElementById('machineModal').style.display = 'none';
+      document.getElementById('partModal').style.display = 'none';
+      document.getElementById('reasonModal').style.display = 'none';
+    }
+
+    window.selectedShift = 'A';
+    window.selectShift = function (letter) {
+      window.selectedShift = letter;
+      document.querySelectorAll('.shift-btn').forEach(b => b.classList.toggle('active', b.dataset.shift === letter));
+    };
+
+    function logoutOperator() {
+      sessionStorage.removeItem('activeSessionMeta');
+      document.documentElement.classList.remove('has-active-session');
+      document.getElementById('pinInput').value = '';
+      document.getElementById('loginOverlay').style.display = 'flex';
+      document.getElementById('loginError').style.display = 'none';
+      window.currentSession.operatorId = '---';
+      window.currentSession.hours = [0, 0, 0, 0, 0, 0, 0, 0];
+      window.currentSession.reasons = {};
+      window.currentSession.reasonNotes = {};
+      document.getElementById('operatorDisplay').innerText = '---';
+    }
+
+    function toggleTheme() {
+      const ledger = document.getElementById('themeLedger');
+      const cyber = document.getElementById('themeCyber');
+      const cyberIsActive = !cyber.disabled;
+      cyber.disabled = cyberIsActive;
+      ledger.disabled = !cyberIsActive;
+      localStorage.setItem('terminalTheme', cyberIsActive ? 'ledger' : 'cyber');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+  </script>
+</body>
+
+</html>
